@@ -5,12 +5,20 @@ from PIL import Image
 import numpy as np
 import tensorflow as tf
 import streamlit as st
+import gdown
 
 
-working_dir = os.path.dirname(os.path.abspath(__file__))
-model_path = f"{working_dir}/trained_model/plant_disease_prediction_model.h5"
-# Load the pre-trained model
-model_path = r"C:\Users\Lenovo\Desktop\pythonPlant_Diseases\app\trained_model\Plant_Diseases_Prediction_model.h5"
+model_filename = "Plant_diseases_Prediction_model.h5"
+model_path = os.path.join(working_dir, model_filename)
+
+# Google Drive file ID (replace with your actual ID)
+file_id = "1On-_95vpaFT7l2TqirTNDe2SUHYugz1q"
+url = f"https://drive.google.com/uc?id={file_id}"
+
+# Download if not already present
+if not os.path.exists(model_path):
+    gdown.download(url, model_path, quiet=False)
+
 model = tf.keras.models.load_model(model_path)
 
 # loading the class names

@@ -21,12 +21,13 @@ url = f"https://drive.google.com/uc?id={file_id}"
 if not os.path.exists(model_path):
     gdown.download(url, model_path, quiet=False)
 
+# Load model
 model = tf.keras.models.load_model(model_path)
 
-# Load class indices
-class_indices_path = os.path.join(working_dir, "class_indices.json")
+# Updated path: class_indices.json is in root, not model_files
+class_indices_path = "class_indices.json"
 if not os.path.exists(class_indices_path):
-    st.error("class_indices.json file is missing in the model_files directory.")
+    st.error("class_indices.json file is missing in the root directory.")
     st.stop()
 
 with open(class_indices_path, "r") as f:

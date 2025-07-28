@@ -4,4 +4,4 @@ port = $PORT
 enableCORS = false
 
 [general]
-pythonVersion = "3.11"
+pythonVersion = "3.9"

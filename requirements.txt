@@ -1,7 +1,5 @@
 streamlit==1.25.0
-tensorflow==2.11.0
-protobuf>=3.20
+tensorflow==2.10.1
 Pillow
 gdown
 numpy
-altair

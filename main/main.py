@@ -1,68 +1,59 @@
 import os
 import json
+import urllib.request
 from PIL import Image
 import numpy as np
 import tensorflow as tf
 import streamlit as st
-import gdown
 
-# Create working directory
-working_dir = "model_files"
-os.makedirs(working_dir, exist_ok=True)
+# Setup paths
+model_url = "https://huggingface.co/ranaHimanshi/plant-disease-model/resolve/main/plant_disease_prediction_model.h5"
+model_filename = "plant_disease_prediction_model.h5"
+model_path = os.path.join(".", model_filename)
 
-model_filename = "Plant_diseases_Prediction_model.h5"
-model_path = os.path.join(working_dir, model_filename)
-
-# ✅ Updated Google Drive file ID from your shared link
-file_id = "1-DVwbDlf2UP-1HjvcwPk9e0fDnbTnriP"
-url = f"https://drive.google.com/uc?id={file_id}"
-
-# Download if not already present
+# Download model if not present
 if not os.path.exists(model_path):
-    gdown.download(url, model_path, quiet=False)
+    with st.spinner("Downloading model..."):
+        urllib.request.urlretrieve(model_url, model_path)
 
-# ✅ Load model (if not already present in your original code)
+# Load the model
 model = tf.keras.models.load_model(model_path)
 
-# Updated path: class_indices.json is in root, not model_files
+# Load class indices (this must be uploaded to root of Hugging Face space)
 class_indices_path = "class_indices.json"
 if not os.path.exists(class_indices_path):
-    st.error("class_indices.json file is missing in the root directory.")
+    st.error("❌ 'class_indices.json' is missing in the root directory.")
     st.stop()
 
 with open(class_indices_path, "r") as f:
     class_indices = json.load(f)
 
-# Image preprocessing
-def load_and_preprocess_image(image_path, target_size=(224, 224)):
-    img = Image.open(image_path).convert('RGB')
+# Preprocessing function
+def load_and_preprocess_image(image, target_size=(224, 224)):
+    img = Image.open(image).convert('RGB')
     img = img.resize(target_size)
-    img_array = np.array(img)
+    img_array = np.array(img) / 255.0
     img_array = np.expand_dims(img_array, axis=0)
-    img_array = img_array.astype('float32') / 255.
     return img_array
 
-# Predict class
-def predict_image_class(model, image_path, class_indices):
-    preprocessed_img = load_and_preprocess_image(image_path)
-    predictions = model.predict(preprocessed_img)
+# Prediction function
+def predict_image_class(image):
+    img_array = load_and_preprocess_image(image)
+    predictions = model.predict(img_array)
     predicted_class_index = np.argmax(predictions, axis=1)[0]
     predicted_class_name = class_indices[str(predicted_class_index)]
     return predicted_class_name
 
-# Streamlit UI
-st.title('🌿 Plant Disease Classifier')
+# Streamlit App UI
+st.title("🌿 Plant Disease Prediction App")
+st.markdown("Upload a clear image of a leaf to detect the disease.")
 
-uploaded_image = st.file_uploader("Upload a leaf image...", type=["jpg", "jpeg", "png"])
+uploaded_file = st.file_uploader("📷 Upload leaf image", type=["jpg", "jpeg", "png"])
 
-if uploaded_image is not None:
-    image = Image.open(uploaded_image)
-    col1, col2 = st.columns(2)
+if uploaded_file is not None:
+    st.image(uploaded_file, caption="Uploaded Image", width=200)
 
-    with col1:
-        st.image(image.resize((150, 150)), caption="Uploaded Image")
-
-    with col2:
-        if st.button('Classify'):
-            prediction = predict_image_class(model, uploaded_image, class_indices)
-            st.success(f'🧠 Prediction: **{prediction}**')
+    if st.button("🔍 Predict"):
+        with st.spinner("Analyzing..."):
+            prediction = predict_image_class(uploaded_file)
+            st.success(f"🧠 Prediction: **{prediction}**")

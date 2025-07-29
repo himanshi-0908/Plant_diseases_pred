@@ -13,18 +13,16 @@ os.makedirs(working_dir, exist_ok=True)
 model_filename = "Plant_diseases_Prediction_model.h5"
 model_path = os.path.join(working_dir, model_filename)
 
-# Google Drive file ID (replace with your actual ID)
-file_id = "1On-_95vpaFT7l2TqirTNDe2SUHYugz1q"
+# ✅ Updated Google Drive file ID from your shared link
+file_id = "1-DVwbDlf2UP-1HjvcwPk9e0fDnbTnriP"
 url = f"https://drive.google.com/uc?id={file_id}"
 
 # Download if not already present
 if not os.path.exists(model_path):
     gdown.download(url, model_path, quiet=False)
 
-# Load model
-#model = tf.keras.models.load_model(model_path)
-model = tf.keras.models.load_model(model_path, compile=False)
-
+# ✅ Load model (if not already present in your original code)
+model = tf.keras.models.load_model(model_path)
 
 # Updated path: class_indices.json is in root, not model_files
 class_indices_path = "class_indices.json"

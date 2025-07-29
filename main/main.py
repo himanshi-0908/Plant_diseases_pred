@@ -26,11 +26,10 @@ if not os.path.exists(model_path):
         st.error("⚠️ Failed to download model from Hugging Face.")
         st.stop()
 
-# --- 3. Load the model
+# --- 3. Load the model (handle InputLayer issue)
 try:
-    #model = tf.keras.models.load_model(model_path)
-    model = tf.keras.models.load_model(model_path, compile=False)
-
+    from keras.saving.legacy.saved_model import load_model  # For Keras 3 compatibility
+    model = load_model(model_path, compile=False)
 except Exception as e:
     st.error(f"🚫 Model loading failed: {e}")
     st.stop()

@@ -22,7 +22,9 @@ if not os.path.exists(model_path):
     gdown.download(url, model_path, quiet=False)
 
 # Load model
-model = tf.keras.models.load_model(model_path)
+#model = tf.keras.models.load_model(model_path)
+model = tf.keras.models.load_model(model_path, compile=False)
+
 
 # Updated path: class_indices.json is in root, not model_files
 class_indices_path = "class_indices.json"

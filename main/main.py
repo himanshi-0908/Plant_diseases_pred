@@ -26,12 +26,13 @@ if not os.path.exists(model_path):
         st.error("⚠️ Failed to download model from Hugging Face.")
         st.stop()
 
-# --- 3. Load the model (handle InputLayer issue)
+# --- 3. Load the model
 try:
-    from keras.saving.legacy.saved_model import load_model  # For Keras 3 compatibility
+    from keras.models import load_model  # safer import for compatibility
     model = load_model(model_path, compile=False)
 except Exception as e:
     st.error(f"🚫 Model loading failed: {e}")
+    st.info("Try downgrading Keras using: `pip install keras==2.11.0`")
     st.stop()
 
 # --- 4. Load class indices
